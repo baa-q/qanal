@@ -1,2 +1,2 @@
 # qanal
-secret
+Ready to Collection!!
