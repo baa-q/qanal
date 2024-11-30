@@ -1,0 +1,27 @@
+{"properties": [
+  {
+    "name": "mybatis.type-aliases-package",
+    "type": "java.lang.String",
+    "description": "A description for 'mybatis.type-aliases-package'"
+  },
+  {
+    "name": "mybatis.mapper-locations",
+    "type": "java.lang.String",
+    "description": "A description for 'mybatis.mapper-locations'"
+  },
+  {
+    "name": "mybatis.configuration.map-underscore-to-camel-case",
+    "type": "java.lang.String",
+    "description": "A description for 'mybatis.configuration.map-underscore-to-camel-case'"
+  },
+  {
+    "name": "mybatis.configuration.log-impl",
+    "type": "java.lang.String",
+    "description": "A description for 'mybatis.configuration.log-impl'"
+  },
+  {
+    "name": "mybatis.configuration.default-fetch-size",
+    "type": "java.lang.String",
+    "description": "A description for 'mybatis.configuration.default-fetch-size'"
+  }
+]}

@@ -1,3 +1,16 @@
 spring : 
     application : 
         name : qanal
+    datasource :
+        driver-class-name : org.postgresql.Driver
+        url : jdbc:postgresql://localhost:5432/postgres
+        username : qanal
+        password : qanal!@#$
+mybatis : 
+    type-aliases-package : com.silqin.qanal.core.domain
+    mapper-locations : classpath:mapper/**/*.xml
+    configuration : 
+        map-underscore-to-camel-case : true
+        log-impl : org.apache.ibatis.logging.stdout.StdOutImpl
+        default-fetch-size: 1000
+        

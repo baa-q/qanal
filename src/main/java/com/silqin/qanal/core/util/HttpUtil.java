@@ -1,4 +1,4 @@
-package com.silqin.core.util;
+package com.silqin.qanal.core.util;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.silqin.qanal.core.mapper.CategoryMapper">
+
+    <!-- Add your SQL statements here -->
+    <select id="getList" resultType="Category">
+        SELECT
+            category_id,
+            category_type,
+            category_name,
+            depth1_id,
+            depth2_id,
+            depth3_id,
+            is_collection,
+            update_date
+        FROM
+            category
+    </select>
+
+    <select id="getCategory" parameterType="java.lang.String" resultType="Category">
+        SELECT
+            category_id,
+            category_type,
+            category_name,
+            depth1_id,
+            depth2_id,
+            depth3_id,
+            is_collection,
+            updateDate
+        FROM 
+            category
+        WHERE
+            category_id = #{categoryId}
+    </select>
+
+    <insert id="insert" parameterType="Category">
+        INSERT INTO category (
+            category_id,
+            category_type,
+            category_name,
+            depth1_id,
+            depth2_id,
+            depth3_id,
+            is_collection,
+            update_date
+        ) VALUES (
+            #{categoryId},
+            #{categoryType},
+            #{categoryName},
+            #{depth1Id},
+            #{depth2Id},
+            #{depth3Id},
+            #{isCollection},
+            #{updateDate}
+        )
+    </insert>
+
+    <update id="update" parameterType="Category">
+        UPDATE category SET
+            category_id = #{categoryId},
+            category_type = #{categoryType},
+            category_name = #{categoryName},
+            depth1_id = #{depth1Id},
+            depth2_id = #{depth2Id},
+            depth3_id = #{depth3Id},
+            is_collection = #{isCollection},
+            update_date = #{updateDate}
+        WHERE
+            category_id = #{categoryId}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.String">
+        DELETE FROM
+            category
+        WHERE
+            category_id = #{categoryId}
+    </delete>
+
+    <delete id="deleteAll">
+        DELETE FROM
+            category
+    </delete>
+
+</mapper>
