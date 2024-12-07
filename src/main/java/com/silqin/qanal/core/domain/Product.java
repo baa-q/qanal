@@ -17,5 +17,6 @@ public class Product {
     private double ratingStar;
     private int ratingCount;
     private String memo;
+    private String url;
 
 }

@@ -13,7 +13,9 @@
             depth2_id,
             depth3_id,
             is_collection,
-            update_date
+            update_date,
+            delete_date,
+            url
         FROM
             category
     </select>
@@ -27,7 +29,9 @@
             depth2_id,
             depth3_id,
             is_collection,
-            updateDate
+            updateDate,
+            delete_date,
+            url
         FROM 
             category
         WHERE
@@ -43,7 +47,9 @@
             depth2_id,
             depth3_id,
             is_collection,
-            update_date
+            update_date,
+            delete_date,
+            url
         ) VALUES (
             #{categoryId},
             #{categoryType},
@@ -52,7 +58,9 @@
             #{depth2Id},
             #{depth3Id},
             #{isCollection},
-            #{updateDate}
+            #{updateDate},
+            #{delete_date},
+            #{url}
         )
     </insert>
 
@@ -65,7 +73,9 @@
             depth2_id = #{depth2Id},
             depth3_id = #{depth3Id},
             is_collection = #{isCollection},
-            update_date = #{updateDate}
+            update_date = #{updateDate},
+            delete_date = #{delete_date},
+            url = #{url}
         WHERE
             category_id = #{categoryId}
     </update>
