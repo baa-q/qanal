@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.silqin.qanal.api.category.service.CategoryService;
 import com.silqin.qanal.core.domain.Category;
+import com.silqin.qanal.core.domain.Product;
 import com.silqin.qanal.core.domain.Rank;
 import com.silqin.qanal.core.util.HttpUtil;
 
@@ -166,7 +167,7 @@ public class CoupangCollector {
 
     }
 
-    public List<Rank> getRankByCategory(Document doc, Category category) throws Exception {
+    public List<Rank> getRanksByCategory(Document doc, Category category) throws Exception {
         List<Rank> ranks = new ArrayList<>();
 
         Elements liEls = doc.select("#productList > li");
@@ -193,6 +194,41 @@ public class CoupangCollector {
         }
 
         return ranks;
+    }
+
+    public List<Product> getProductsByCategory(Document doc, Category category) {
+        List<Product> products = new ArrayList<>();
+
+        Elements liEls = doc.select("#productList > li");
+
+        String categoryId = category.getCategoryId();
+        System.out.println("Category ID: " + categoryId);
+
+        int index = 0;
+        List<Element> liElsList = liEls.subList(0, 30);
+        for (Element li : liElsList) {
+            index++;
+            System.out.println("Rank: " + index);
+            String productId = li.attr("data-product-id");
+            String productName = li.select(".name").text().trim();
+            int productPrice = Integer.parseInt(li.select(".price-value").text().trim().replaceAll("[^0-9]", ""));
+            String productUnitPrice = li.select(".unit-price").text().trim();
+            int productRatingStar = Integer.parseInt(li.select(".rating").text().trim().replaceAll("[^0-9]", ""));
+            int productRatingCount = Integer.parseInt(li.select(".rating-total-count").text().trim().replaceAll("[^0-9]", ""));
+
+            Product product = new Product();
+            product.setProductId(productId);
+            product.setProductName(productName);
+            product.setPrice(productPrice);
+            product.setUnitPrice(productUnitPrice);
+            product.setRatingStar(productRatingStar);
+            product.setRatingCount(productRatingCount);
+            products.add(product);
+
+            System.out.println(product.toString());
+        }
+
+        return products;
     }
 
     private Document fetchDocumentWithRetry(String url) throws Exception {

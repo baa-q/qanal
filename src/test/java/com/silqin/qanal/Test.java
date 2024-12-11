@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
 import com.silqin.qanal.core.crawler.coupang.CoupangCollector;
 import com.silqin.qanal.core.crawler.tool.UserAgentTool;
 import com.silqin.qanal.core.domain.Category;
+import com.silqin.qanal.core.domain.Product;
 import com.silqin.qanal.core.domain.Rank;
 import com.silqin.qanal.core.util.HttpUtil;
 
@@ -34,7 +35,8 @@ public class Test {
             CoupangCollector coupangCollector = new CoupangCollector();
             Category category = new Category();
             category.setCategoryId("6585");
-            List<Rank> ranks = coupangCollector.getRankByCategory(doc, category);
+            // List<Rank> ranks = coupangCollector.getRanksByCategory(doc, category);
+            List<Product> products = coupangCollector.getProductsByCategory(doc, category);
 
         } catch (IOException e) {
             System.err.println("웹페이지를 가져오는 중 오류가 발생했습니다: " + e.getMessage());
