@@ -40,7 +40,7 @@ public class HttpUtil {
             Document doc = null;
             Connection conn;
             
-            do {
+            // do {
                 conn = Jsoup.connect(urlString)
                         .userAgent(userAgent)
                         .header("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,vi;q=0.6")
@@ -49,7 +49,7 @@ public class HttpUtil {
                 
                 doc = conn.get();
                 System.out.println(doc.location());
-            } while (doc.location().contains("m.coupang"));
+            // } while (doc.location().contains("m.coupang"));
 
             return doc;
         } catch (HttpStatusException e) {
