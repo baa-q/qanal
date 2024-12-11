@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.silqin.qanal.api.category.service.CategoryService;
 import com.silqin.qanal.core.domain.Category;
+import com.silqin.qanal.core.domain.Rank;
 import com.silqin.qanal.core.util.HttpUtil;
 
 
@@ -163,6 +164,35 @@ public class CoupangCollector {
 
         return categories;
 
+    }
+
+    public List<Rank> getRankByCategory(Document doc, Category category) throws Exception {
+        List<Rank> ranks = new ArrayList<>();
+
+        Elements liEls = doc.select("#productList > li");
+
+        String categoryId = category.getCategoryId();
+        System.out.println("Category ID: " + categoryId);
+
+        int index = 0;
+        List<Element> liElsList = liEls.subList(0, 30);
+        for (Element li : liElsList) {
+            index++;
+            System.out.println("Rank: " + index);
+            String productId = li.attr("data-product-id");
+            String productName = li.select(".name").text().trim();
+
+            Rank rank = new Rank();
+            rank.setCategoryId(categoryId);
+            rank.setRank(index);
+            rank.setProductId(productId);
+            ranks.add(rank);
+
+            System.out.println(productName);
+            System.out.println(rank.toString());
+        }
+
+        return ranks;
     }
 
     private Document fetchDocumentWithRetry(String url) throws Exception {
