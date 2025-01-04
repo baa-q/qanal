@@ -7,9 +7,7 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.silqin.qanal.api.category.service.CategoryService;
 import com.silqin.qanal.core.domain.Category;
 import com.silqin.qanal.core.domain.Product;
 import com.silqin.qanal.core.domain.Rank;
@@ -27,6 +25,22 @@ public class CoupangCollector {
         
         try {
             System.out.println("::::::::::::::::::: 쿠팡 카테고리 정보 수집 시작 :::::::::::::::::::");
+
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println("::::::::::::::::::: 쿠팡 카테고리 정보 수집 종료 :::::::::::::::::::");
+        }
+
+    }
+
+    public List<Category> getCategories() {
+
+        List<Category> allCategories = null;
+
+        try {
+            System.out.println("::::::::::::::::::: 쿠팡 카테고리 정보 수집 시작 :::::::::::::::::::");
     
             // 메인 페이지 가져오기
             Document mainPageDoc = null;
@@ -36,38 +50,13 @@ public class CoupangCollector {
             while (depth1Categories.size() == 0) {
                 mainPageDoc = fetchDocumentWithRetry(COUPANG_URL);
                 System.out.println("Main Page Loaded Successfully");
-                System.out.println(mainPageDoc);
-
                 depth1Categories = getDepth1ByMainPage(mainPageDoc);
-                System.out.println("::::::::::::::::::: 대분류 카테고리 정보 획득 시도 :::::::::::::::::::");
-                System.out.println("대분류 카테고리 수: " + depth1Categories.size());
             }
-            System.out.println("::::::::::::::::::: 대분류 카테고리 정보 획득 성공 :::::::::::::::::::");
     
+            allCategories = new ArrayList<>(depth1Categories);
             // 중분류와 소분류 가져오기
-            List<Category> allCategories = new ArrayList<>(depth1Categories);
             for (Category depth1Category : depth1Categories) {
-
-                // 중분류 페이지 가져오기
-                Document depth2CategoryDoc = fetchDocumentWithRetry(COUPANG_URL + depth1Category.getUrl());
-                System.out.println("대분류 " + depth1Category.getCategoryId() + ":" + depth1Category.getCategoryName() + "의 중분류 Page Loaded Successfully: " + depth1Category.getUrl());
-
-                // 중분류와 소분류 카테고리 수집
-                List<Category> depth2Categories = getChildByCategoryPage(depth2CategoryDoc, depth1Category);
-                System.out.println("대분류 " + depth1Category.getCategoryId() + ":" + depth1Category.getCategoryName() + "의 하위 중분류 카테고리 수: " + depth2Categories.size());
-                allCategories.addAll(depth2Categories);
-
-                for (Category depth2Category : depth2Categories) {
-                    // 소분류 페이지 가져오기
-                    Document depth3CategoryDoc = fetchDocumentWithRetry(COUPANG_URL + depth2Category.getUrl());
-                    System.out.println("중분류 " + depth2Category.getCategoryId() + ":" + depth2Category.getCategoryName() + "의 소분류 Page Loaded Successfully: " + depth2Category.getUrl());
-
-                    // 소분류 카테고리 수집
-                    List<Category> depth3Categories = getChildByCategoryPage(depth3CategoryDoc, depth2Category);
-                    System.out.println("중분류 " + depth2Category.getCategoryId() + ":" + depth2Category.getCategoryName() + "의 하위 소분류 카테고리 수: " + depth3Categories.size());
-                    allCategories.addAll(depth3Categories);
-                }
-
+                getCategoriesByDepth1Id(depth1Category.getCategoryId());
             }
     
         } catch (IOException e) {
@@ -78,6 +67,102 @@ public class CoupangCollector {
             System.out.println("::::::::::::::::::: 쿠팡 카테고리 정보 수집 종료 :::::::::::::::::::");
         }
 
+        return allCategories;
+    }
+
+
+    public List<Category> getCategoriesByDepth1Id(String depth1Id) {
+        List<Category> allCategories = new ArrayList<>();
+
+        try {
+
+            // 중분류 페이지 가져오기
+            Elements depth2LiEls = new Elements();
+            while (depth2LiEls.size() == 0) {
+                String url = COUPANG_URL + "/np/categories/" + depth1Id;;
+                Document depth2CategoryDoc = fetchDocumentWithRetry(url);
+                depth2LiEls = depth2CategoryDoc.select("#searchCategoryComponent ul.search-option-items > li");
+            }
+
+            // 중분류 카테고리 수집
+            for (Element depth2CategoryEl : depth2LiEls) {
+
+                Category depth2Category = getCategoryByEl(depth2CategoryEl, depth1Id);
+                allCategories.add(depth2Category);
+
+                // // 소분류 페이지 가져오기
+                // Elements depth3LiEls = new Elements();
+                // while (depth3LiEls.size() == 0) {
+                //     Document depth3CategoryDoc = fetchDocumentWithRetry(COUPANG_URL + depth2Category.getUrl());
+                //     depth3LiEls = depth3CategoryDoc.select("#searchCategoryComponent ul.search-option-items > li");
+                // }
+
+                // // 소분류 카테고리 수집
+                // for (Element depth3CategoryEl : depth3LiEls) {
+                //     Category depth3Category = getCategoryByEl(depth3CategoryEl, depth2Category);
+                //     allCategories.add(depth3Category);
+                // }
+
+            }
+        
+        } catch (IOException e) {
+            System.err.println("정보를 가져오는 중 오류가 발생했습니다: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return allCategories;
+    }
+
+
+    //For Depth2, Depth3
+    private Category getCategoryByEl(Element el, Category parentCategory) {
+        Category category = getCategoryByEl(el, parentCategory.getDepth1Id());
+        String id = category.getCategoryId();
+
+        if(parentCategory.getDepth2Id() != null) {
+            category.setDepth2Id(parentCategory.getDepth2Id());
+            category.setDepth3Id(id);
+        }else {
+            category.setDepth2Id(id);
+        }
+
+        if(category.getDepth3Id() == null){
+            System.out.println("대분류 : " + category.getDepth1Id() + 
+            " 중분류 : " + category.getDepth2Id() +  " 중분류 이름 : " + category.getCategoryName());
+        }else{
+            System.out.println("대분류 : " + category.getDepth1Id() + 
+            " 중분류 : " + category.getDepth2Id() +  " 중분류 이름 : " + parentCategory.getCategoryName() + 
+            " 소분류 : " + category.getDepth3Id() + " 소분류 이름 : " + category.getCategoryName());
+        }
+
+        return category;
+    }
+
+    //For Depth2
+    private Category getCategoryByEl(Element el, String depth1Id) {
+        Category category = new Category();
+
+        String url = el.attr("data-link-uri");
+        String[] hrefParts = url.split("/");
+        String type = hrefParts[hrefParts.length - 2];
+        String id = hrefParts[hrefParts.length - 1];
+        String name = el.select("> label > .seo-link-url").text().trim();
+        if(name.equals("")) {
+            name = el.select("> label").text().trim();
+        }
+
+        category.setCategoryId(id);
+        category.setCategoryType(type);
+        category.setCategoryName(name);
+        category.setUrl(url);
+        category.setDepth1Id(depth1Id);
+        category.setDepth2Id(id);
+
+        System.out.println("대분류 : " + category.getDepth1Id() + 
+        " 중분류 : " + category.getDepth2Id() +  " 중분류 이름 : " + category.getCategoryName());
+
+        return category;
     }
 
     private List<Category> getDepth1ByMainPage(Document doc) {
@@ -115,56 +200,6 @@ public class CoupangCollector {
         }
 
         return categories;
-    }
-    
-
-    private List<Category> getChildByCategoryPage(Document doc, Category parenCategory) {
-        List<Category> categories = new ArrayList<>();
-
-        Elements liEls = null;
-        if (parenCategory.isHasChildLi()) {
-            liEls = doc.select("#searchCategoryComponent ul.search-option-items > li");
-        } else {
-            liEls = doc.select("#searchCategoryComponent ul.search-option-items-child > li");
-        }
-
-        for (Element categoryEl : liEls) {
-            String url = categoryEl.attr("data-link-uri");
-            String[] hrefParts = url.split("/");
-            String type = hrefParts[hrefParts.length - 2];
-            String id = hrefParts[hrefParts.length - 1];
-            String name = liEls.select(".seo-link-url[href*='"+url+"']").text().trim();
-
-            Category category = new Category();
-            category.setCategoryId(id);
-            category.setCategoryType(type);
-            category.setCategoryName(name);
-            category.setDepth1Id(parenCategory.getDepth1Id());
-            
-            Elements childrenLi = categoryEl.select(".ul.search-option-items-child > li");
-            category.setHasChildLi(true);
-            if (childrenLi.size() == 0) {
-                category.setHasChildLi(false);
-            }
-
-            if (parenCategory.getDepth2Id() != null) { //부모에게 depth2가 있다면 현재 카테고리는 depth3
-                category.setDepth2Id(parenCategory.getDepth2Id());
-                category.setDepth3Id(id);
-            }else { //부모에게 depth2가 없다면 현재 카테고리는 depth2
-                category.setDepth2Id(id);
-            }
-            category.setUrl(url);
-            categories.add(category);
-
-        }
-        
-        // 카테고리 로그 출력
-        for (Category category : categories) {
-            System.out.println(category.toString());
-        }
-
-        return categories;
-
     }
 
     public List<Rank> getRanksByCategory(Document doc, Category category) throws Exception {

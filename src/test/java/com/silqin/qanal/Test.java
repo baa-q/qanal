@@ -4,17 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import com.silqin.qanal.core.crawler.coupang.CoupangCollector;
 import com.silqin.qanal.core.crawler.tool.UserAgentTool;
 import com.silqin.qanal.core.domain.Category;
 import com.silqin.qanal.core.domain.Product;
-import com.silqin.qanal.core.domain.Rank;
 import com.silqin.qanal.core.util.HttpUtil;
 
 public class Test {

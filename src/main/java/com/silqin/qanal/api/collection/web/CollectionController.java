@@ -18,10 +18,14 @@ import com.silqin.qanal.core.util.ApiResponse;
 public class CollectionController {
 
     @GetMapping("run")
-    public ResponseEntity<ApiResponse> run(@RequestParam(value = "category", required = true) String category) {
+    public ResponseEntity<ApiResponse> run(@RequestParam(value = "category", required = false) String category) {
         try {
             CoupangCollector coupangCollector = new CoupangCollector();
-            coupangCollector.collect();
+            if (category != null) {
+                coupangCollector.getCategoriesByDepth1Id(category);
+            } else {
+                coupangCollector.getCategories();
+            }
 
             ApiResponse<String> response = ApiResponse.success("Category is collected!");
             return ResponseEntity.ok(response);

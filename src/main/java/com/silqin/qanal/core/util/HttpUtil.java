@@ -17,7 +17,7 @@ import org.jsoup.nodes.Document;
 
 public class HttpUtil {
 
-    private static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = 2500;
 
     private final static String[] userAgents = {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -40,15 +40,17 @@ public class HttpUtil {
             Document doc = null;
             Connection conn;
             
+            System.out.println("URL: " + urlString);
+
             // do {
                 conn = Jsoup.connect(urlString)
                         .userAgent(userAgent)
                         .header("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,vi;q=0.6")
                         .header("Referer", "https://www.google.com") // Optional
-                        .timeout(100000); // Set timeout to 10 seconds
+                        .timeout(30000); // Set timeout to 10 seconds
                 
                 doc = conn.get();
-                System.out.println(doc.location());
+                System.out.println("URL SUCCESS: "+doc.location());
             // } while (doc.location().contains("m.coupang"));
 
             return doc;
